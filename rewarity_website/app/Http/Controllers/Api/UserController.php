@@ -8,17 +8,25 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
     public function register(Request $request): JsonResponse
     {
+        if ($request->filled('userType')) {
+            $request->merge([
+                'userType' => $this->normalizeRole($request->input('userType')),
+            ]);
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'userType' => ['required', 'string', 'max:255'],
+            'userType' => ['required', 'string', 'max:255', Rule::in(config('user_roles.allowed'))],
             'mobileNumbers' => ['required', 'array', 'min:1'],
             'mobileNumbers.*.number' => ['required', 'string', 'max:20'],
             'mobileNumbers.*.isPrimary' => ['required', 'boolean'],
@@ -90,6 +98,7 @@ class UserController extends Controller
                 'userType' => $user->user_type,
                 'createdDate' => optional($user->created_at)->toISOString(),
                 'status' => $user->status,
+                'avatarUrl' => $user->avatar_url,
             ],
         ], 201);
     }
@@ -151,7 +160,153 @@ class UserController extends Controller
                 'email' => $user->email,
                 'userType' => $user->user_type,
                 'token' => $token,
+                'avatarUrl' => $user->avatar_url,
             ],
+        ]);
+    }
+
+    public function profile(Request $request): JsonResponse
+    {
+        $token = $request->bearerToken();
+
+        if (! $token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized.',
+            ], 401);
+        }
+
+        $payload = $this->decodeJwtToken($token);
+
+        if (! $payload) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid or expired token.',
+            ], 401);
+        }
+
+        $user = User::where('user_uid', $payload['sub'] ?? null)->first();
+
+        if (! $user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not found.',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile fetched successfully.',
+            'data' => [
+                'userId' => $user->user_uid,
+                'employeeId' => $user->employee_id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'userType' => $user->user_type,
+                'status' => $user->status,
+                'createdDate' => optional($user->created_at)->toISOString(),
+                'avatarUrl' => $user->avatar_url,
+            ],
+        ]);
+    }
+
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $token = $request->bearerToken();
+
+        if (! $token) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthorized.',
+            ], 401);
+        }
+
+        $payload = $this->decodeJwtToken($token);
+
+        if (! $payload) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid or expired token.',
+            ], 401);
+        }
+
+        $user = User::where('user_uid', $payload['sub'] ?? null)->first();
+
+        if (! $user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User not found.',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => ['sometimes', 'string', 'max:255'],
+            'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['sometimes', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['sometimes', 'string'],
+            'status' => ['sometimes', 'in:Active,Inactive'],
+            'userType' => ['sometimes', 'string', Rule::in(config('user_roles.allowed'))],
+            'avatar' => ['sometimes', 'file', 'image', 'max:2048'],
+        ]);
+
+        if (array_key_exists('name', $validated)) {
+            $user->name = $validated['name'];
+        }
+
+        if (array_key_exists('email', $validated)) {
+            $user->email = $validated['email'];
+        }
+
+        if (array_key_exists('status', $validated)) {
+            $user->status = $validated['status'];
+        }
+
+        if (array_key_exists('userType', $validated)) {
+            $user->user_type = $this->normalizeRole($validated['userType']);
+        }
+
+        if (array_key_exists('password', $validated)) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar_path && Storage::disk('public')->exists($user->avatar_path)) {
+                Storage::disk('public')->delete($user->avatar_path);
+            }
+
+            $user->avatar_path = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile updated successfully.',
+            'data' => [
+                'userId' => $user->user_uid,
+                'employeeId' => $user->employee_id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'userType' => $user->user_type,
+                'status' => $user->status,
+                'avatarUrl' => $user->avatar_url,
+                'updatedDate' => optional($user->updated_at)->toISOString(),
+            ],
+        ]);
+    }
+
+    public function roles(): JsonResponse
+    {
+        $roles = config('user_roles.allowed');
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Roles fetched successfully.',
+            'data' => collect($roles)
+                ->map(fn (string $role): array => [
+                    'id' => Str::slug($role),
+                    'name' => $role,
+                ])->all(),
         ]);
     }
 
@@ -228,5 +383,61 @@ class UserController extends Controller
     private function base64UrlEncode(string $data): string
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    private function decodeJwtToken(string $token): ?array
+    {
+        $segments = explode('.', $token);
+
+        if (count($segments) !== 3) {
+            return null;
+        }
+
+        [$headerB64, $payloadB64, $signatureB64] = $segments;
+
+        $secret = $this->getJwtSecret();
+        $expectedSignature = $this->base64UrlEncode(hash_hmac('sha256', $headerB64.'.'.$payloadB64, $secret, true));
+
+        if (! hash_equals($expectedSignature, $signatureB64)) {
+            return null;
+        }
+
+        $payloadJson = $this->base64UrlDecode($payloadB64);
+
+        if ($payloadJson === null) {
+            return null;
+        }
+
+        $payload = json_decode($payloadJson, true);
+
+        if (! is_array($payload)) {
+            return null;
+        }
+
+        if (isset($payload['exp']) && $payload['exp'] < now()->timestamp) {
+            return null;
+        }
+
+        return $payload;
+    }
+
+    private function base64UrlDecode(string $data): ?string
+    {
+        $decoded = base64_decode(strtr($data, '-_', '+/'), true);
+
+        return $decoded === false ? null : $decoded;
+    }
+
+    private function normalizeRole(?string $role): ?string
+    {
+        if ($role === null) {
+            return null;
+        }
+
+        $normalized = Str::title(strtolower(trim($role)));
+
+        $allowed = collect(config('user_roles.allowed'));
+
+        return $allowed->first(fn (string $allowedRole): bool => strcasecmp($allowedRole, $normalized) === 0) ?? $normalized;
     }
 }

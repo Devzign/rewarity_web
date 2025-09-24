@@ -38,9 +38,12 @@ class UserResource extends Resource
                         ->email()
                         ->required()
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('user_type')
+                    Forms\Components\Select::make('user_type')
                         ->label('Role')
-                        ->maxLength(255),
+                        ->options(collect(config('user_roles.allowed', []))
+                            ->mapWithKeys(fn (string $role): array => [$role => $role])
+                            ->toArray())
+                        ->required(),
                     Forms\Components\Select::make('status')
                         ->options([
                             'Active' => 'Active',

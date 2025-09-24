@@ -1,0 +1,130 @@
+:root {
+    --rewarity-green-500: #17b348;
+    --rewarity-green-600: #139a3c;
+    --rewarity-green-700: #0f7c30;
+    --rewarity-sidebar: linear-gradient(185deg, #063720 0%, #0c5a33 45%, #17b348 100%);
+    --rewarity-card-shadow: 0 18px 30px -12px rgba(13, 98, 54, 0.25);
+}
+
+body.fi-body.fi-panel-admin {
+    background: #f6f8fb;
+    color: #0b1f15;
+}
+
+body.fi-body.fi-panel-admin .fi-topbar {
+    background: #ffffff;
+    box-shadow: 0 12px 40px rgba(11, 47, 28, 0.12);
+    border-bottom: none;
+}
+
+body.fi-body.fi-panel-admin .fi-topbar > div {
+    border: none !important;
+}
+
+body.fi-body.fi-panel-admin .fi-sidebar {
+    background: var(--rewarity-sidebar);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+body.fi-body.fi-panel-admin .fi-sidebar-nav {
+    color: inherit;
+}
+
+body.fi-body.fi-panel-admin .fi-sidebar-nav-item,
+body.fi-body.fi-panel-admin .fi-sidebar-nav-item a {
+    color: rgba(255, 255, 255, 0.78) !important;
+}
+
+body.fi-body.fi-panel-admin .fi-sidebar-nav-item-icon,
+body.fi-body.fi-panel-admin .fi-sidebar-nav-item-label {
+    color: inherit;
+}
+
+body.fi-body.fi-panel-admin .fi-sidebar-nav-item[aria-current="page"],
+body.fi-body.fi-panel-admin .fi-sidebar-nav-item a[aria-current="page"],
+body.fi-body.fi-panel-admin .fi-sidebar-nav-item:hover,
+body.fi-body.fi-panel-admin .fi-sidebar-nav-item a:hover {
+    color: #ffffff !important;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%);
+    border-radius: 14px;
+}
+
+body.fi-body.fi-panel-admin .fi-sidebar-header {
+    background: transparent;
+    border-bottom: none;
+}
+
+body.fi-body.fi-panel-admin .fi-sidebar-header img {
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
+}
+
+body.fi-body.fi-panel-admin .fi-stat-card,
+body.fi-body.fi-panel-admin .fi-wi-stats-overview-stat {
+    border-radius: 18px !important;
+    border: none !important;
+    box-shadow: var(--rewarity-card-shadow) !important;
+    background: linear-gradient(160deg, rgba(23, 179, 72, 0.15) 0%, rgba(255, 255, 255, 0.92) 45%, #ffffff 100%) !important;
+}
+
+body.fi-body.fi-panel-admin .fi-wi-stats-overview-stat-label,
+body.fi-body.fi-panel-admin .fi-wi-stats-overview-stat-value {
+    color: #072313 !important;
+}
+
+body.fi-body.fi-panel-admin .fi-wi-stats-overview-stat-description {
+    color: var(--rewarity-green-600) !important;
+    font-weight: 500;
+}
+
+body.fi-body.fi-panel-admin .hero-spotlight {
+    background: linear-gradient(145deg, rgba(6, 50, 28, 0.87) 0%, rgba(23, 179, 72, 0.92) 60%, rgba(31, 206, 90, 0.95) 100%);
+    color: #ffffff;
+    border-radius: 28px;
+    box-shadow: 0 24px 60px -20px rgba(10, 101, 45, 0.55);
+    overflow: hidden;
+    position: relative;
+}
+
+body.fi-body.fi-panel-admin .hero-spotlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.25), transparent 45%),
+        radial-gradient(circle at 82% 0%, rgba(255, 255, 255, 0.3), transparent 35%);
+    pointer-events: none;
+}
+
+body.fi-body.fi-panel-admin .hero-spotlight .hero-metric {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+body.fi-body.fi-panel-admin .hero-spotlight .hero-metric strong {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+body.fi-body.fi-panel-admin .profile-card {
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 18px 45px -25px rgba(8, 107, 44, 0.5);
+    border: none;
+}
+
+body.fi-body.fi-panel-admin .profile-card h3 {
+    color: #07311b;
+}
+
+body.fi-body.fi-panel-admin .profile-card .profile-section-title {
+    font-weight: 600;
+    color: var(--rewarity-green-700);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+body.fi-body.fi-panel-admin .fi-topbar nav a:hover {
+    color: var(--rewarity-green-500);
+}

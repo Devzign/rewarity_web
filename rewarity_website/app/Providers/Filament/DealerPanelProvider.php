@@ -2,7 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\Auth\EditProfile as CustomEditProfile;
+use App\Filament\Widgets\DealerProductStats;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -18,29 +18,30 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class AdminPanelProvider extends PanelProvider
+class DealerPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $panel = $panel
+        return $panel
             ->default()
-            ->brandName('')
+            ->id('dealer')
+            ->path('dealer')
+            ->brandName('Dealer Portal')
             ->brandLogo(asset('images/logo.png'))
-            ->id('admin')
-            ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::hex('#17b348'),
+                'primary' => Color::Blue,
             ])
-            ->darkMode(false, true)
-            ->profile(CustomEditProfile::class, isSimple: false)
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/Dealer/Resources'), for: 'App\\Filament\\Dealer\\Resources')
+            ->discoverPages(in: app_path('Filament/Dealer/Pages'), for: 'App\\Filament\\Dealer\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([])
+            ->discoverWidgets(in: app_path('Filament/Dealer/Widgets'), for: 'App\\Filament\\Dealer\\Widgets')
+            ->widgets([
+                DealerProductStats::class,
+            ])
+            ->profile()
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -54,8 +55,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                'role:dealer',
             ]);
-
-        return $panel;
     }
 }
