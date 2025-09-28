@@ -3,7 +3,6 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -11,7 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 
-class User extends Authenticatable implements HasAvatar
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -75,17 +74,21 @@ class User extends Authenticatable implements HasAvatar
         return $this->hasMany(Purchase::class, 'dealer_id');
     }
 
-    public function getFilamentAvatarUrl(): ?string
+    public function getAvatarUrl(): ?string
     {
         if (! $this->avatar_path) {
             return null;
         }
 
-        return Storage::disk('public')->url($this->avatar_path);
+        if (! Storage::disk('public')->exists($this->avatar_path)) {
+            return null;
+        }
+
+        return asset('storage/' . ltrim($this->avatar_path, '/'));
     }
 
     public function getAvatarUrlAttribute(): ?string
     {
-        return $this->getFilamentAvatarUrl();
+        return $this->getAvatarUrl();
     }
 }

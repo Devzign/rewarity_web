@@ -7,6 +7,13 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Admin Panel
+
+- URL: `/admin`
+- Only users with `user_type` set to `Admin` and `status` of `Active` may sign in.
+- The interface lives under `resources/views/admin` and uses the static assets mirrored in `public/assets/admin`.
+- Create an admin account with `php artisan admin:create`, then log in at `/admin/login`.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
