@@ -14,6 +14,14 @@
 - The interface lives under `resources/views/admin` and uses the static assets mirrored in `public/assets/admin`.
 - Create an admin account with `php artisan admin:create`, then log in at `/admin/login`.
 
+## Password Reset
+
+- Admins can request a reset link at `/admin/forgot-password` and complete the flow at `/admin/reset-password/{token}`.
+- API endpoints for mobile clients:
+  - `POST /api/v1/users/password/forgot` → accepts `{ "email": "user@example.com" }` and returns a generic status message.
+  - `POST /api/v1/users/password/reset` → accepts `{ "email", "token", "password", "password_confirmation" }` to update credentials.
+- Reset tokens expire after 60 minutes and requests are throttled to one active token per email at a time.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

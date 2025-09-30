@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PasswordResetController;
 use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\PurchaseApiController;
 use App\Http\Controllers\Api\UserController;
@@ -14,4 +15,6 @@ Route::prefix('v1')->group(function (): void {
     Route::post('users/profile/update', [UserController::class, 'updateProfile']);
     Route::post('users/login', [UserController::class, 'login']);
     Route::post('users/register', [UserController::class, 'register']);
+    Route::post('users/password/forgot', [PasswordResetController::class, 'sendResetLink']);
+    Route::post('users/password/reset', [PasswordResetController::class, 'reset']);
 });

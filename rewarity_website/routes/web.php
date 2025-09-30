@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\PurchaseController as AdminPurchaseController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Admin\PasswordResetController as AdminPasswordResetController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Middleware\EnsureUserHasRole;
 use App\Http\Controllers\ProductController;
@@ -41,6 +42,13 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
             Route::get('privacy', [AdminProfileController::class, 'privacy'])->name('privacy');
         });
     });
+});
+
+Route::middleware('guest:web')->group(function (): void {
+    Route::get('admin/forgot-password', [AdminPasswordResetController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('admin/forgot-password', [AdminPasswordResetController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::get('admin/reset-password/{token}', [AdminPasswordResetController::class, 'showResetForm'])->name('password.reset');
+    Route::post('admin/reset-password', [AdminPasswordResetController::class, 'reset'])->name('password.update');
 });
 
 Route::middleware(['auth', EnsureUserHasRole::class . ':dealer'])->group(function (): void {
