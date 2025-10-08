@@ -22,6 +22,28 @@
   - `POST /api/v1/users/password/reset` → accepts `{ "email", "token", "password", "password_confirmation" }` to update credentials.
 - Reset tokens expire after 60 minutes and requests are throttled to one active token per email at a time.
 
+## Hostinger Deployment
+
+The project includes `deploy/hostinger-deploy.sh` to push code and the SQLite database to Hostinger over SSH.
+
+### One-time setup
+1. Copy `deploy/.env.hostinger.example` to the project root as `.env.hostinger`, then update the SSH host, port, user, remote path, and other toggles.
+2. Create an environment file for production (for example `.env.production`) whose values match the Hostinger server, including `APP_URL` and any storage configuration.
+3. (Optional) Adjust `.env.hostinger` flags if you do not want to upload the SQLite database or plan to run `php artisan storage:link`/migrations on the server.
+4. Point `rewarity.devzign.com` at the `/public` directory inside `/home/u551475123/domains/devzign.com/public_html/rewarity` so the Laravel front controller is served.
+
+### Deploy
+
+Run the script from the project root:
+
+```bash
+bash deploy/hostinger-deploy.sh
+```
+
+The script installs Composer dependencies (`--no-dev`), installs Node packages, builds Vite assets, clears local caches, syncs the project to the server with `rsync`, uploads the selected `.env` file and SQLite database (if enabled), and finally runs remote artisan optimisation commands.
+
+Ensure `composer`, `npm`, `php`, `ssh`, `scp`, and `rsync` are available on the machine that runs the deployment.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

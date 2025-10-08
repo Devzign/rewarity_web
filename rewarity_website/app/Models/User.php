@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -52,6 +53,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Ensure email addresses are stored in lowercase for case-insensitive lookups.
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: static fn (?string $value): ?string => $value !== null ? strtolower($value) : null,
+        );
     }
 
     public function address(): HasOne

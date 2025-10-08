@@ -22,7 +22,7 @@
 
                             <div class="form-group">
                                 <label for="email" class="text-muted small text-uppercase">Email address</label>
-                                <input type="email" name="email" id="email" value="{{ old('email') }}" class="form-control" required autofocus>
+                                <input type="email" name="email" id="email" value="{{ old('email') }}" class="form-control" autocomplete="username" required autofocus>
                             </div>
 
                             <div class="form-group">
@@ -30,7 +30,12 @@
                                     <span>Password</span>
                                     <a href="{{ route('password.request') }}" class="text-muted">Forgot?</a>
                                 </label>
-                                <input type="password" name="password" id="password" class="form-control" required>
+                                <div class="input-group" data-password-container>
+                                    <input type="password" name="password" id="password" class="form-control" autocomplete="current-password" required>
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-secondary" data-password-toggle aria-label="Show password">Show</button>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group form-check">
@@ -48,3 +53,31 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        var container = document.querySelector('[data-password-container]');
+        if (!container) {
+            return;
+        }
+
+        var input = container.querySelector('input');
+        var toggle = container.querySelector('[data-password-toggle]');
+
+        if (!input || !toggle) {
+            return;
+        }
+
+        toggle.addEventListener('click', function () {
+            var showing = input.getAttribute('type') === 'text';
+            input.setAttribute('type', showing ? 'password' : 'text');
+            toggle.textContent = showing ? 'Show' : 'Hide';
+            toggle.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+            if (!showing) {
+                input.focus();
+            }
+        });
+    })();
+</script>
+@endpush

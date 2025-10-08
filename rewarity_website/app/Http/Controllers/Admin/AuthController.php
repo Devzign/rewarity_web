@@ -23,6 +23,8 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        $credentials['email'] = strtolower($credentials['email']);
+
         $remember = $request->boolean('remember');
 
         if (! Auth::attempt($credentials, $remember)) {

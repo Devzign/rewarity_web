@@ -8,8 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            $table->string('avatar_path')->nullable()->after('status');
+        $afterColumn = Schema::hasColumn('users', 'status') ? 'status' : 'password';
+
+        Schema::table('users', function (Blueprint $table) use ($afterColumn): void {
+            $table->string('avatar_path')->nullable()->after($afterColumn);
         });
     }
 
