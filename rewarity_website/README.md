@@ -12,7 +12,7 @@
 - URL: `/admin`
 - Only users with `user_type` set to `Admin` and `status` of `Active` may sign in.
 - The interface lives under `resources/views/admin` and uses the static assets mirrored in `public/assets/admin`.
-- Seeding the database (`php artisan db:seed`) creates or updates a default administrator using `DEFAULT_ADMIN_EMAIL`, `DEFAULT_ADMIN_PASSWORD`, and `DEFAULT_ADMIN_NAME` env values (fallback: `admin@rewarity.com` / `Password123!` / `Administrator`).
+- The application automatically ensures a default admin user exists on boot (and during `php artisan db:seed`) using `DEFAULT_ADMIN_EMAIL`, `DEFAULT_ADMIN_PASSWORD`, and `DEFAULT_ADMIN_NAME` env values (fallback: `admin@rewarity.com` / `Password123!` / `Administrator`). Toggle this with `ENSURE_DEFAULT_ADMIN_ON_BOOT=false`; use `DEFAULT_ADMIN_FORCE_PASSWORD_SYNC=true` if you need to overwrite an existing password with the env value.
 - Create an admin account with `php artisan admin:create`, then log in at `/admin/login`.
 
 ## Password Reset
